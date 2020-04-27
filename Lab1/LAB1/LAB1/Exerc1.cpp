@@ -171,21 +171,35 @@ int main()
 
 bool even(int i)
 {
-	return i % 2 == 0;
+	return i % 2 == 0; //O(1)
 }
 
-//Iterative algorithm
+//Iterative algorithm, T(n) = O(n)
 void TND004::stable_partition_iterative(std::vector<int>& V, Test p)
 {
 	//ADD IMPLEMENTATION
 
-    std::cout << "Note implemented, yet!!\n";
+	std::vector<int> t; t.reserve(V.size()); //O(1), O(n)
+	std::vector<int> f; f.reserve(V.size()); //O(1), O(n)
 
-
+	for (int i = 0; i < V.size(); ++i) //O(n), comparisons and increment not considered
+	{
+		if (p(V[i]))
+		{
+			t.push_back(V[i]); //O(1)
+		}
+		else
+		{
+			f.push_back(V[i]); //O(1)
+		}
+	}
+	V.clear(); //O(n)
+	V.insert(V.end(), t.begin(), t.end()); //O(n)
+	V.insert(V.end(), f.begin(), f.end()); //O(n)
 }
 
 
-//Auxiliary function that performs the stable partition using a divide-and-conquer strategy
+//Auxiliary function that performs the stable partition using a divide-and-conquer strategy T(n) = O(n*log(n))
 namespace TND004
 {
 	//Divide-and-conquer algorithm: stable-partition the sub-sequence in V starting at first and ending at last-1
@@ -194,16 +208,30 @@ namespace TND004
 	std::vector<int>::iterator stable_partition(std::vector<int>& V, std::vector<int>::iterator first, std::vector<int>::iterator last, Test p)
 	{
 		//ADD IMPLEMENTATION
+		std::vector<int>::iterator mid = first + (last - first) / 2; //O(1)
 
-        std::cout << "Note implemented, yet!!\n";
+		//std::copy(first, last, std::ostream_iterator<int>(std::cout, " ")); std::cout << std::endl; //For debugging purposes
 
-        return std::begin(V); //this is dummy code that should be removed
+		if((last - first) <= 1 && p(*mid)) //Comparisons not considered, function call to p is O(1)
+		{
+			return first+1;
+		}
+		else if((last - first) <= 1 && !p(*mid)) //Comparisons not considered, function call to p is O(1)
+		{
+			return first;
+		}
+		else
+		{
+			std::vector<int>::iterator it1 = stable_partition(V, first, mid, p); //Recursive calls complexity is O(log(n))
+			std::vector<int>::iterator it3 = stable_partition(V,mid, last, p); //Recursive calls complexity is O(log(n))
+			return std::rotate(it1, mid, it3); //O(n)
+		}   
 	}
 }
 
 void TND004::stable_partition(std::vector<int>& V, Test p)
 {
-	TND004::stable_partition(V, std::begin(V), std::end(V), p); //call auxiliary function
+	TND004::stable_partition(V, std::begin(V), std::end(V), p); //Call auxiliary function
 }
 
 
